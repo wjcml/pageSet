@@ -875,6 +875,8 @@ p { margin-bottom: 1.25rem; }
 <li><a href="#_threadlocal_作用线程本地存储">4.6. ThreadLocal 作用(线程本地存储)</a>
 <ul class="sectlevel3">
 <li><a href="#_threadlocal结构">4.6.1. ThreadLocal结构</a></li>
+<li><a href="#_threadlocal父子线程数据传递方案">4.6.2. ThreadLocal父子线程数据传递方案</a></li>
+<li><a href="#_inheritablethreadlocal和线程池之间的问题">4.6.3. InheritableThreadLocal和线程池之间的问题</a></li>
 </ul>
 </li>
 <li><a href="#_指令重排序">4.7. 指令重排序</a></li>
@@ -3662,6 +3664,87 @@ public class TestThread {
 <div class="paragraph">
 <p>我们还要注意 <strong>Entry</strong>， 它的 <strong>key</strong> 是 <strong>ThreadLocal&lt;?&gt; k</strong> ，继承自 <strong>WeakReference</strong>， 也就是我们常说的 <strong>弱引用类型</strong>。</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_threadlocal父子线程数据传递方案">4.6.2. ThreadLocal父子线程数据传递方案</h4>
+<div class="sect4">
+<h5 id="_子线程能否直接拿到父线程threadlocal中的值">子线程能否直接拿到父线程ThreadLocal中的值？</h5>
+<div class="paragraph">
+<p><strong>答案：不能</strong></p>
+</div>
+<div class="paragraph">
+<p>由于ThreadLocal的实现机制，在子线程中调用get时，我们拿到的Thread对象是当前子线程对象，所以在调用 get 方法时，得到的是 null。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_inheritablethreadlocal">InheritableThreadLocal</h5>
+<div class="paragraph">
+<p>既然我们在子线程中不能通过 <strong>ThreadLocal</strong> 的 <strong>get()</strong> 直接获取到父线程中的值，那么有什么办法去解决这样的问题呢，毕竟有时候我们又有这样的需求。答案就是使用 <strong>InheritableThreadLocal</strong>。</p>
+</div>
+<div class="paragraph">
+<p>先说一下 <strong>InheritableThreadLocal</strong> 的原理：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>InheritableThreadLocal</strong> 是 <strong>ThreadLocal</strong> 的子类，在创建 <strong>InheritableThreadLocal</strong> 对象的时候，会将  <strong>ThreadLocalMap</strong> 赋值给 <strong>Thread</strong> 中的 <strong>inheritableThreadLocals</strong> 属性；</p>
+</li>
+<li>
+<p>在创建新线程的时候会检查父线程中 <strong>inheritableThreadLocals</strong> 变量是否为 <strong>null</strong>，如果不为 <strong>null</strong> 则 <strong>copy</strong> 一份 <strong>ThradLocalMap</strong> 到子线程的 <strong>inheritableThreadLocals</strong> 成员变量中去（Thread中的init方法）。</p>
+</li>
+<li>
+<p>因为覆写了 <strong>getMap(Thread)</strong> 和 <strong>CreateMap()</strong> 方法，所以 <strong>get</strong> 的时候，就可以在 <strong>getMap(t)</strong> 的时候就会从 <strong>inheritableThreadLocals</strong> 中拿到 <strong>map</strong> 对象（可以看下面的源码），从而实现了可以拿到父线程 <strong>ThreadLocal</strong> 中的值。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>InheritableThreadLocal的源码：</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class InheritableThreadLocal&lt;T&gt; extends ThreadLocal&lt;T&gt; {
+    /**
+     * Computes the child's initial value for this inheritable thread-local
+     * variable as a function of the parent's value at the time the child
+     * thread is created.  This method is called from within the parent
+     * thread before the child is started.
+     * &lt;p&gt;
+     * This method merely returns its input argument, and should be overridden
+     * if a different behavior is desired.
+     *
+     * @param parentValue the parent thread's value
+     * @return the child thread's initial value
+     */
+    protected T childValue(T parentValue) {
+        return parentValue;
+    }
+
+    /**
+     * Get the map associated with a ThreadLocal.
+     *
+     * @param t the current thread
+     */
+    ThreadLocalMap getMap(Thread t) {
+       return t.inheritableThreadLocals;
+    }
+
+    /**
+     * Create the map associated with a ThreadLocal.
+     *
+     * @param t the current thread
+     * @param firstValue value for the initial entry of the table.
+     */
+    void createMap(Thread t, T firstValue) {
+        t.inheritableThreadLocals = new ThreadLocalMap(this, firstValue);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_inheritablethreadlocal和线程池之间的问题">4.6.3. InheritableThreadLocal和线程池之间的问题</h4>
+
 </div>
 </div>
 <div class="sect2">
