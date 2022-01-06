@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.16">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <meta name="author" content="汪俊程">
 <title>Java工程师之路</title>
 <style>
@@ -858,28 +858,41 @@ p { margin-bottom: 1.25rem; }
 </ul>
 </li>
 <li><a href="#_线程的生命周期">4.2. 线程的生命周期</a></li>
-<li><a href="#_线程的创建方式">4.3. 线程的创建方式</a></li>
+<li><a href="#_线程的创建方式">4.3. 线程的创建方式</a>
+<ul class="sectlevel3">
+<li><a href="#_thread">4.3.1. Thread</a></li>
+<li><a href="#_runable">4.3.2. Runable</a></li>
+<li><a href="#_callable">4.3.3. Callable</a></li>
+<li><a href="#_基于线程池的方式">4.3.4. 基于线程池的方式</a></li>
+<li><a href="#_runable和callable区别">4.3.5. Runable和Callable区别</a></li>
+</ul>
+</li>
 <li><a href="#_java线程池">4.4. Java线程池</a>
 <ul class="sectlevel3">
 <li><a href="#_threadpoolexecutor_推荐">4.4.1. ThreadPoolExecutor (推荐)</a></li>
 <li><a href="#_executors">4.4.2. Executors</a></li>
 </ul>
 </li>
-<li><a href="#_两个线程共享数据">4.5. 两个线程共享数据</a>
+<li><a href="#_经验积累">4.5. 经验积累</a>
 <ul class="sectlevel3">
-<li><a href="#_volatile_2">4.5.1. volatile</a></li>
-<li><a href="#_synchronized_2">4.5.2. synchronized</a></li>
-<li><a href="#_runnable_对象作为一个类的内部类">4.5.3. Runnable 对象作为一个类的内部类</a></li>
+<li><a href="#_记一次多线程研发遇到的坑">4.5.1. 记一次多线程研发遇到的坑</a></li>
 </ul>
 </li>
-<li><a href="#_threadlocal_作用线程本地存储">4.6. ThreadLocal 作用(线程本地存储)</a>
+<li><a href="#_两个线程共享数据">4.6. 两个线程共享数据</a>
 <ul class="sectlevel3">
-<li><a href="#_threadlocal结构">4.6.1. ThreadLocal结构</a></li>
-<li><a href="#_threadlocal父子线程数据传递方案">4.6.2. ThreadLocal父子线程数据传递方案</a></li>
-<li><a href="#_inheritablethreadlocal和线程池之间的问题">4.6.3. InheritableThreadLocal和线程池之间的问题</a></li>
+<li><a href="#_volatile_2">4.6.1. volatile</a></li>
+<li><a href="#_synchronized_2">4.6.2. synchronized</a></li>
+<li><a href="#_runnable_对象作为一个类的内部类">4.6.3. Runnable 对象作为一个类的内部类</a></li>
 </ul>
 </li>
-<li><a href="#_指令重排序">4.7. 指令重排序</a></li>
+<li><a href="#_threadlocal_作用线程本地存储">4.7. ThreadLocal 作用(线程本地存储)</a>
+<ul class="sectlevel3">
+<li><a href="#_threadlocal结构">4.7.1. ThreadLocal结构</a></li>
+<li><a href="#_threadlocal父子线程数据传递方案">4.7.2. ThreadLocal父子线程数据传递方案</a></li>
+<li><a href="#_inheritablethreadlocal和线程池之间的问题">4.7.3. InheritableThreadLocal和线程池之间的问题</a></li>
+</ul>
+</li>
+<li><a href="#_指令重排序">4.8. 指令重排序</a></li>
 </ul>
 </li>
 <li><a href="#_Spring_chapter">5. Spring</a>
@@ -3314,8 +3327,9 @@ pipeline &#8594; jvm进程内的线程间管道
 </div>
 <div class="sect2">
 <h3 id="_线程的创建方式">4.3. 线程的创建方式</h3>
+<div class="sect3">
+<h4 id="_thread">4.3.1. Thread</h4>
 <div class="listingblock">
-<div class="title">方式一：Thread</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class NewThread extends Thread {
     public void run() {
@@ -3326,8 +3340,22 @@ pipeline &#8594; jvm进程内的线程间管道
 new Thread（new NewThread()).start();</code></pre>
 </div>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Thread 本质上是实现了 Runable 接口。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_runable">4.3.2. Runable</h4>
 <div class="listingblock">
-<div class="title">方式二：Runable</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class NewThread implements Runnable {
     public void run() {
@@ -3338,10 +3366,14 @@ new Thread（new NewThread()).start();</code></pre>
 new Thread（new NewThread()).start();</code></pre>
 </div>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_callable">4.3.3. Callable</h4>
 <div class="listingblock">
-<div class="title">方式三：ExecutorService、Callable&lt;Class&gt;、Future (子线程会有返回值)</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Test {
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ExecutorService、Callable&lt;Class&gt;、Future (子线程会有返回值)
+
+public class Test {
     public static void main(String[] args) {
         // 线程池
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -3386,8 +3418,10 @@ class Task implements Callable&lt;String&gt;{
 </tr>
 </table>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_基于线程池的方式">4.3.4. 基于线程池的方式</h4>
 <div class="listingblock">
-<div class="title">方式四：基于线程池的方式</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// 创建线程池
 ExecutorService threadPool = Executors.newFixedThreadPool(10);
@@ -3418,6 +3452,29 @@ while(true) {
 </td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_runable和callable区别">4.3.5. Runable和Callable区别</h4>
+<div class="listingblock">
+<div class="content">
+<pre>1. Runable 没有返回值，Callable有返回值（返回Future对象）
+2. Runable不能抛出异常，Callable可以抛出异常
+3. Callable在JUC包下，属于线程安全的接口</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Callalble接口支持返回执行结果，需要调用FutureTask.get()得到，此方法会阻塞主进程的继续往下执行，如果不调用不会阻塞。这个其实和 CountDownLatch + Runable 实现主线程等待所有子线程执行完再继续执行的功能类似。
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -3568,9 +3625,16 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect2">
-<h3 id="_两个线程共享数据">4.5. 两个线程共享数据</h3>
+<h3 id="_经验积累">4.5. 经验积累</h3>
 <div class="sect3">
-<h4 id="_volatile_2">4.5.1. volatile</h4>
+<h4 id="_记一次多线程研发遇到的坑">4.5.1. 记一次多线程研发遇到的坑</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_两个线程共享数据">4.6. 两个线程共享数据</h3>
+<div class="sect3">
+<h4 id="_volatile_2">4.6.1. volatile</h4>
 <div class="listingblock">
 <div class="content">
 <pre>其一是保证该变量对所有线程可见,这里的可见性指的是当一个线程修改了变量的值,那么新的值对于其他线程是可以立即获取的。</pre>
@@ -3578,7 +3642,7 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synchronized_2">4.5.2. synchronized</h4>
+<h4 id="_synchronized_2">4.6.2. synchronized</h4>
 <div class="listingblock">
 <div class="content">
 <pre>1.利用锁的机制来实现同步的 +
@@ -3587,7 +3651,7 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect3">
-<h4 id="_runnable_对象作为一个类的内部类">4.5.3. Runnable 对象作为一个类的内部类</h4>
+<h4 id="_runnable_对象作为一个类的内部类">4.6.3. Runnable 对象作为一个类的内部类</h4>
 <div class="paragraph">
 <p>将 Runnable 对象作为一个类的内部类,共享数据作为这个类的成员变量,每个线程对共享数据的操作方法也封装在外部类,以便实现对数据的各个操作的同步和互斥, <code>作为内部类的各个 Runnable 对象调用外部类的这些方法</code></p>
 </div>
@@ -3630,7 +3694,7 @@ public class TestThread {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_threadlocal_作用线程本地存储">4.6. ThreadLocal 作用(线程本地存储)</h3>
+<h3 id="_threadlocal_作用线程本地存储">4.7. ThreadLocal 作用(线程本地存储)</h3>
 <div class="paragraph">
 <p>最常见的 ThreadLocal 使用场景为：</p>
 </div>
@@ -3645,10 +3709,10 @@ public class TestThread {
 </ul>
 </div>
 <div class="paragraph">
-<p>ThreadLocal，很多地方叫做线程本地变量，也有些地方叫做线程本地存储，ThreadLocal 的作用是提供线程内的局部变量，这种变量在线程的生命周期内起作用，减少同一个线程内多个函数或者组件之间一些公共变量的传递的复杂度。</p>
+<p>ThreadLocal，很多地方叫做 <strong>线程本地变量</strong>，也有些地方叫做线程本地存储，ThreadLocal 的作用是提供线程内的局部变量，这种变量在线程的生命周期内起作用，减少同一个线程内多个函数或者组件之间一些公共变量的传递的复杂度。</p>
 </div>
 <div class="sect3">
-<h4 id="_threadlocal结构">4.6.1. ThreadLocal结构</h4>
+<h4 id="_threadlocal结构">4.7.1. ThreadLocal结构</h4>
 <div class="paragraph">
 <p>在 ThreadLocal 中，有一个内部类 <strong>ThreadLocalMap</strong>。ThreadLocalMap 中定义了一个 <strong>Entry 数组</strong>。</p>
 </div>
@@ -3666,7 +3730,7 @@ public class TestThread {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_threadlocal父子线程数据传递方案">4.6.2. ThreadLocal父子线程数据传递方案</h4>
+<h4 id="_threadlocal父子线程数据传递方案">4.7.2. ThreadLocal父子线程数据传递方案</h4>
 <div class="sect4">
 <h5 id="_子线程能否直接拿到父线程threadlocal中的值">子线程能否直接拿到父线程ThreadLocal中的值？</h5>
 <div class="paragraph">
@@ -3743,12 +3807,12 @@ public class TestThread {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inheritablethreadlocal和线程池之间的问题">4.6.3. InheritableThreadLocal和线程池之间的问题</h4>
+<h4 id="_inheritablethreadlocal和线程池之间的问题">4.7.3. InheritableThreadLocal和线程池之间的问题</h4>
 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_指令重排序">4.7. 指令重排序</h3>
+<h3 id="_指令重排序">4.8. 指令重排序</h3>
 <div class="paragraph">
 <p>什么是指令重排序？</p>
 </div>
@@ -7120,7 +7184,7 @@ public void cancelRecord(TransactionContext transactionContext, CapitalTradeOrde
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-09-24 12:00:54 +0800
+Last updated 2022-01-06 15:17:00 +0800
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
