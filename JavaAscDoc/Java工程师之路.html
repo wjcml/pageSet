@@ -194,7 +194,8 @@ a:hover, a:focus { color: #1d4b8f; }
 a img { border: none; }
 
 /* Default paragraph styles */
-p { font-family: inherit; font-weight: normal; font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; text-rendering: optimizeLegibility; }
+p { font-family: 微软雅黑; font-weight: normal; font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; text-rendering: optimizeLegibility; }
+/* p { font-family: inherit; font-weight: normal; font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; text-rendering: optimizeLegibility; } */
 p aside { font-size: 0.875em; line-height: 1.35; font-style: italic; }
 
 /* Default header styles */
@@ -873,9 +874,11 @@ p { margin-bottom: 1.25rem; }
 <li><a href="#_executors">4.4.2. Executors</a></li>
 </ul>
 </li>
-<li><a href="#_经验积累">4.5. 经验积累</a>
+<li><a href="#_记一次多线程研发遇到的坑">4.5. 记一次多线程研发遇到的坑</a>
 <ul class="sectlevel3">
-<li><a href="#_记一次多线程研发遇到的坑">4.5.1. 记一次多线程研发遇到的坑</a></li>
+<li><a href="#_问题背景">4.5.1. 问题背景</a></li>
+<li><a href="#_研发方案的迭代">4.5.2. 研发方案的迭代</a></li>
+<li><a href="#_遇到的坑">4.5.3. 遇到的坑</a></li>
 </ul>
 </li>
 <li><a href="#_两个线程共享数据">4.6. 两个线程共享数据</a>
@@ -893,6 +896,7 @@ p { margin-bottom: 1.25rem; }
 </ul>
 </li>
 <li><a href="#_指令重排序">4.8. 指令重排序</a></li>
+<li><a href="#_多线程框架">4.9. 多线程框架</a></li>
 </ul>
 </li>
 <li><a href="#_Spring_chapter">5. Spring</a>
@@ -1090,6 +1094,9 @@ p { margin-bottom: 1.25rem; }
 </div>
 <div class="paragraph">
 <p>计划：java基础，spring，springBoot，springCloud，dubbo，docker，netty，nginx，大数据处理（Hadoop，Spark），JVM，数据结构，leecode（力扣），MySQL</p>
+</div>
+<div class="paragraph">
+<p>文章中的 <code>TODO</code> 标识表示没有做完的，需要后续补充完善的。</p>
 </div>
 </div>
 </div>
@@ -3625,10 +3632,111 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect2">
-<h3 id="_经验积累">4.5. 经验积累</h3>
+<h3 id="_记一次多线程研发遇到的坑">4.5. 记一次多线程研发遇到的坑</h3>
 <div class="sect3">
-<h4 id="_记一次多线程研发遇到的坑">4.5.1. 记一次多线程研发遇到的坑</h4>
+<h4 id="_问题背景">4.5.1. 问题背景</h4>
+<div class="listingblock">
+<div class="content">
+<pre>1. 开发一套经验支持系统，就是通过创建公共的经验模型和规则，然后由模型获取并整合数据，将数据输入规则中，得到返回结果。
+2. 难点: 模型中存在多个对象（M），并且每个对象可以通过SQL获取API获取多个数据（N），也就是说，跑一次模型，一个规则需要被执行 M 次，并且需要查询数据 M * N 次。
+3. 目标: 降低跑一次模型需要用的时间，提升速度。</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>如下图:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/多线程遇到的坑-业务逻辑图.png" alt="多线程遇到的坑 业务逻辑图">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_研发方案的迭代">4.5.2. 研发方案的迭代</h4>
+<div class="listingblock">
+<div class="content">
+<pre>1. for循环
+2. 线程池框架 ThreadPoolExecutor（Disruptor，gitee-京东零售）</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_遇到的坑">4.5.3. 遇到的坑</h4>
+<div class="sect4">
+<h5 id="_1死锁">1、死锁</h5>
+<div class="listingblock">
+<div class="content">
+<pre>出现问题的原因:
+1. 只定义了一个线程池
+2. 自定义了 10 个核心线程数
+3. 有 60 个对象需要执行规则逻辑（下面用 A 代替），每个对象需要 调用 2 个api接口获取数据
+4. 如果有 10 个 A 占用了 10 个线程，但是他们需要等待 api 接口获取到数据才能继续执行，但是查数据的任务又在等待队列中，等待核心线程资源释放，这时就会一直等待
 
+解决办法:
+1. 创建两个线程池分别执行这两种任务</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2经典线程安全问题">2、经典线程安全问题</h5>
+<div class="listingblock">
+<div class="content">
+<pre>出现问题的原因:
+1. 多个线程中对同一个对象中的属性进行修改
+
+解决办法:
+1. 禁止在多线程中对同一个对象的属性进行修改
+2. 使用JUC下的线程安全对象
+3. 在子线程中创建新的对象接受需要修改的值，最后通过线程返回值返回
+4. 对数据操作方法加锁（不推荐）</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_3内存泄漏问题">3、内存泄漏问题</h5>
+<div class="sect5">
+<h6 id="_1_问题描述">(1) 问题描述</h6>
+<div class="listingblock">
+<div class="content">
+<pre>在项目部署后，一开始模型和模型实例较少，程序的负担较低，没有发现问题。但是随着模型和模型实例的数量越来越多，我们发现内存占用上涨的非常快，一天的时间就可以将4个G的内存占满（内存泄漏）。</pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_2_可能的原因">(2) 可能的原因</h6>
+<div class="listingblock">
+<div class="content">
+<pre>1. 项目是使用观云台（公司的产品）部署的，因此程序是在 K8s 的 Pod 中运行的。在pod中运行的程序打印日志（输出日志到控制台和写日志到日志文件）是会占用大量的内存的。该项目本身是一个多线程运行模型的程序，为了方便排查问题，日志打印的也比较多，所以造成pod的内存被大量占用。
+
+2. 程序中存在对象一直没有被释放，导致内存泄漏。</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>TODO: 为什么打印大量的日志会造成内存占用过高？后续讨论&#8230;&#8203;</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_3_解决办法">(3) 解决办法</h6>
+<div class="listingblock">
+<div class="content">
+<pre>1. 在正式环境中，日志的打印等级要调低一些，尽量使用 Error 作为日志输出等级。
+
+2. TODO: 在调低日志等级后，目前内存占用还是在缓慢增长。还没有排查出原因，未完待续...</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -3821,6 +3929,22 @@ public class TestThread {
 </div>
 <div class="paragraph">
 <p>重排序不会影响单线程环境的执行结果，但是会破坏多线程的执行语义。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_多线程框架">4.9. 多线程框架</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ThreadPoolExecutor</p>
+</li>
+<li>
+<p>Disruptor</p>
+</li>
+<li>
+<p>gitee-京东零售</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
