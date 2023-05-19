@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <meta name="author" content="汪俊程">
 <title>Java工程师之路</title>
 <style>
@@ -771,8 +771,6 @@ p { margin-bottom: 1.25rem; }
 <li><a href="#_static关键字">1.2.1. static关键字</a></li>
 <li><a href="#_java程序初始化的顺序java实例化的过程">1.2.2. Java程序初始化的顺序（Java实例化的过程）</a></li>
 <li><a href="#_stringbuffer和stringbuilder">1.2.3. StringBuffer和StringBuilder</a></li>
-<li><a href="#_volatile">1.2.4. volatile</a></li>
-<li><a href="#_synchronized">1.2.5. synchronized</a></li>
 </ul>
 </li>
 <li><a href="#_面向对象">1.3. 面向对象</a>
@@ -847,6 +845,12 @@ p { margin-bottom: 1.25rem; }
 <li><a href="#_类加载器">3.1.2. 类加载器</a></li>
 </ul>
 </li>
+<li><a href="#_逃逸分析">3.2. 逃逸分析</a>
+<ul class="sectlevel3">
+<li><a href="#_逃逸分析的原理">3.2.1. 逃逸分析的原理</a></li>
+<li><a href="#_逃逸的方式">3.2.2. 逃逸的方式</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_Thread_chapter">4. 多线程并发</a>
@@ -858,45 +862,78 @@ p { margin-bottom: 1.25rem; }
 <li><a href="#_bionioaio">4.1.3. BIO/NIO/AIO</a></li>
 </ul>
 </li>
-<li><a href="#_线程的生命周期">4.2. 线程的生命周期</a></li>
-<li><a href="#_线程的创建方式">4.3. 线程的创建方式</a>
+<li><a href="#_volatile">4.2. volatile</a>
 <ul class="sectlevel3">
-<li><a href="#_thread">4.3.1. Thread</a></li>
-<li><a href="#_runable">4.3.2. Runable</a></li>
-<li><a href="#_callable">4.3.3. Callable</a></li>
-<li><a href="#_基于线程池的方式">4.3.4. 基于线程池的方式</a></li>
-<li><a href="#_runable和callable区别">4.3.5. Runable和Callable区别</a></li>
+<li><a href="#_什么是jmmjava内存模型">4.2.1. 什么是JMM(Java内存模型)</a></li>
+<li><a href="#_volatile_的作用">4.2.2. volatile 的作用</a></li>
+<li><a href="#_volatile的可见性问题">4.2.3. volatile的可见性问题</a></li>
 </ul>
 </li>
-<li><a href="#_java线程池">4.4. Java线程池</a>
+<li><a href="#_synchronized">4.3. synchronized</a>
 <ul class="sectlevel3">
-<li><a href="#_threadpoolexecutor_推荐">4.4.1. ThreadPoolExecutor (推荐)</a></li>
-<li><a href="#_executors">4.4.2. Executors</a></li>
+<li><a href="#_实现原理">4.3.1. 实现原理</a></li>
 </ul>
 </li>
-<li><a href="#_记一次多线程研发遇到的坑">4.5. 记一次多线程研发遇到的坑</a>
+<li><a href="#_java中的锁">4.4. Java中的锁</a>
 <ul class="sectlevel3">
-<li><a href="#_问题背景">4.5.1. 问题背景</a></li>
-<li><a href="#_研发方案的迭代">4.5.2. 研发方案的迭代</a></li>
-<li><a href="#_遇到的坑">4.5.3. 遇到的坑</a></li>
+<li><a href="#_乐观锁">4.4.1. 乐观锁</a></li>
+<li><a href="#_悲观锁">4.4.2. 悲观锁</a></li>
+<li><a href="#_自旋锁">4.4.3. 自旋锁</a></li>
+<li><a href="#_公平锁和非公平锁">4.4.4. 公平锁和非公平锁</a></li>
+<li><a href="#_可重入锁">4.4.5. 可重入锁</a></li>
+<li><a href="#_读写锁">4.4.6. 读写锁</a></li>
+<li><a href="#_独占锁和共享锁">4.4.7. 独占锁和共享锁</a></li>
+<li><a href="#_锁粗化">4.4.8. 锁粗化</a></li>
 </ul>
 </li>
-<li><a href="#_两个线程共享数据">4.6. 两个线程共享数据</a>
+<li><a href="#_线程的生命周期">4.5. 线程的生命周期</a>
 <ul class="sectlevel3">
-<li><a href="#_volatile_2">4.6.1. volatile</a></li>
-<li><a href="#_synchronized_2">4.6.2. synchronized</a></li>
-<li><a href="#_runnable_对象作为一个类的内部类">4.6.3. Runnable 对象作为一个类的内部类</a></li>
+<li><a href="#_yield">4.5.1. yield()</a></li>
+<li><a href="#_join">4.5.2. join()</a></li>
+<li><a href="#_wait_和_notify">4.5.3. wait() 和 notify()</a></li>
+<li><a href="#_wait_和_sleep_的区别">4.5.4. wait() 和 sleep() 的区别</a></li>
+<li><a href="#_interrupted_和_isinterrupted_的区别">4.5.5. interrupted() 和 isInterrupted() 的区别</a></li>
 </ul>
 </li>
-<li><a href="#_threadlocal_作用线程本地存储">4.7. ThreadLocal 作用(线程本地存储)</a>
+<li><a href="#_线程的创建方式">4.6. 线程的创建方式</a>
 <ul class="sectlevel3">
-<li><a href="#_threadlocal结构">4.7.1. ThreadLocal结构</a></li>
-<li><a href="#_threadlocal父子线程数据传递方案">4.7.2. ThreadLocal父子线程数据传递方案</a></li>
-<li><a href="#_inheritablethreadlocal和线程池之间的问题">4.7.3. InheritableThreadLocal和线程池之间的问题</a></li>
+<li><a href="#_thread">4.6.1. Thread</a></li>
+<li><a href="#_runable">4.6.2. Runable</a></li>
+<li><a href="#_callable">4.6.3. Callable</a></li>
+<li><a href="#_基于线程池的方式">4.6.4. 基于线程池的方式</a></li>
+<li><a href="#_runable和callable区别">4.6.5. Runable和Callable区别</a></li>
 </ul>
 </li>
-<li><a href="#_指令重排序">4.8. 指令重排序</a></li>
-<li><a href="#_多线程框架">4.9. 多线程框架</a></li>
+<li><a href="#_java线程池">4.7. Java线程池</a>
+<ul class="sectlevel3">
+<li><a href="#_threadpoolexecutor_推荐">4.7.1. ThreadPoolExecutor (推荐)</a></li>
+<li><a href="#_executors">4.7.2. Executors</a></li>
+</ul>
+</li>
+<li><a href="#_记一次多线程研发遇到的坑">4.8. 记一次多线程研发遇到的坑</a>
+<ul class="sectlevel3">
+<li><a href="#_问题背景">4.8.1. 问题背景</a></li>
+<li><a href="#_研发方案的迭代">4.8.2. 研发方案的迭代</a></li>
+<li><a href="#_遇到的坑">4.8.3. 遇到的坑</a></li>
+</ul>
+</li>
+<li><a href="#_记一次实战项目遇到的问题和解决方案智能决策平台">4.9. 记一次实战项目遇到的问题和解决方案（智能决策平台）</a>
+<ul class="sectlevel3">
+<li><a href="#_问题一">4.9.1. 问题一</a></li>
+<li><a href="#_问题二">4.9.2. 问题二</a></li>
+<li><a href="#_问题三">4.9.3. 问题三</a></li>
+<li><a href="#_问题三_2">4.9.4. 问题三</a></li>
+</ul>
+</li>
+<li><a href="#_threadlocal_作用线程本地存储">4.10. ThreadLocal 作用(线程本地存储)</a>
+<ul class="sectlevel3">
+<li><a href="#_threadlocal结构">4.10.1. ThreadLocal结构</a></li>
+<li><a href="#_threadlocal内存泄漏问题">4.10.2. ThreadLocal内存泄漏问题</a></li>
+<li><a href="#_threadlocal父子线程数据传递方案">4.10.3. ThreadLocal父子线程数据传递方案</a></li>
+<li><a href="#_inheritablethreadlocal和线程池之间的问题">4.10.4. InheritableThreadLocal和线程池之间的问题</a></li>
+</ul>
+</li>
+<li><a href="#_多线程框架">4.11. 多线程框架</a></li>
 </ul>
 </li>
 <li><a href="#_Spring_chapter">5. Spring</a>
@@ -1228,7 +1265,7 @@ p { margin-bottom: 1.25rem; }
 <div class="sect3">
 <h4 id="_8_种基本类型的包装类和常量池">1.1.2. 8 种基本类型的包装类和常量池</h4>
 <div class="paragraph">
-<p>Java 基本类型的包装类的大部分都实现了常量池技术。<strong>Byte</strong>, <strong>Short</strong>, <strong>Integer</strong>, <strong>Long</strong> 这 4 种包装类默认创建了数值 <strong>[-128，127]</strong> 的相应类型的缓存数据，<strong>Character</strong> 创建了数值在 <strong>[0,127]</strong> 范围的缓存数据，<strong>Boolean</strong> 直接返回 <strong>True</strong> Or <strong>False</strong>。两种浮点数类型的包装类 <strong>Float</strong> , <strong>Double</strong> 并没有实现常量池技术。</p>
+<p>&emsp;&emsp;Java 基本类型的包装类的大部分都实现了常量池技术。<strong>Byte</strong>, <strong>Short</strong>, <strong>Integer</strong>, <strong>Long</strong> 这 4 种包装类默认创建了数值 <strong>[-128，127]</strong> 的相应类型的缓存数据，<strong>Character</strong> 创建了数值在 <strong>[0,127]</strong> 范围的缓存数据，<strong>Boolean</strong> 直接返回 <strong>True</strong> Or <strong>False</strong>。两种浮点数类型的包装类 <strong>Float</strong> , <strong>Double</strong> 并没有实现常量池技术。</p>
 </div>
 <div class="paragraph">
 <p>如果超出对应范围仍然会去创建新的对象，缓存的范围区间的大小只是在性能和资源之间的权衡。</p>
@@ -1421,106 +1458,6 @@ p { margin-bottom: 1.25rem; }
 <code><strong>StringBuffer</strong></code> 和 <code><strong>StringBuilder</strong></code> 长度可变<br>
 <code><strong>StringBuffer</strong></code> 线程安全， <code><strong>StringBuilder</strong></code> 线程不安全<br>
 <code><strong>StringBuilder</strong></code> 速度快</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_volatile">1.2.4. volatile</h4>
-<div class="paragraph">
-<p>参考文档： <a href="https://www.cnblogs.com/javazhiyin/p/13521567.html" target="_blank" rel="noopener">面试官最爱的 volatile 关键字，这些问题你都搞懂了没？</a></p>
-</div>
-<div class="sect4">
-<h5 id="_volatile基本介绍">volatile基本介绍</h5>
-<div class="paragraph">
-<p>volatile可以看成是synchronized的一种轻量级的实现，但volatile并不能完全代替synchronized，volatile有synchronized可见性的特性，但没有synchronized原子性的特性。</p>
-</div>
-<div class="paragraph">
-<p>可见性即用volatile关键字修饰的成员变量表明该变量不存在工作线程的副本，线程每次直接都从主内存中读取，每次读取的都是最新的值，这也就保证了变量对其他线程的 <strong>可见性</strong>。</p>
-</div>
-<div class="paragraph">
-<p>另外，使用volatile还能确保变量不能被 <strong>重排序</strong>，保证了 <strong>有序性</strong>。</p>
-</div>
-<div class="paragraph">
-<p>被 volatile 修饰的变量具有的特性：</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>保证此变量对所有线程的可见性</strong></p>
-</li>
-<li>
-<p><strong>禁止指令重排序优化</strong></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_volatile怎么保证变量对所有线程的可见性">volatile怎么保证变量对所有线程的可见性</h5>
-<div class="paragraph">
-<p>首先我们补充一个重要的概念 <strong>内存可见性</strong>：</p>
-</div>
-<div class="paragraph">
-<p>在JVM内存模型：<strong>主内存</strong> 和 线程独立的 <strong>工作内存</strong>。Java内存模型规定，对于多个线程共享的变量，存储在主内存当中，每个线程都有自己独立的工作内存（比如CPU的寄存器），线程只能访问自己的工作内存，不可以访问其它线程的工作内存。工作内存中保存了主内存共享变量的副本，线程要操作这些共享变量，只能通过操作工作内存中的副本来实现，操作完毕之后再同步回到主内存当中。</p>
-</div>
-<div class="paragraph">
-<p>volatile保证可见性的原理是在每次都从主内存直接读取，因此每次访问都是主内存中最新的版本。所以volatile关键字的作用之一就是保证变量修改的实时可见性。</p>
-</div>
-<div class="paragraph">
-<p>所以：</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>每次直接从主内存读取值</strong>。</p>
-</li>
-<li>
-<p><strong>每次写入强制修改主内存的值</strong>。</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_volatile是如何防止指令重排序优化的呢">volatile是如何防止指令重排序优化的呢？</h5>
-<div class="paragraph">
-<p>volatile关键字通过 “<strong>内存屏障</strong>” 的方式来防止指令被重排序，即：在每个 volatile 读写操作前后加一种CPU指令。</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-内存屏障: 内存屏障（Memory Barrier，或有时叫做内存栅栏，Memory Fence）是一种CPU指令，用于控制特定条件下的重排序和内存可见性问题。
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_synchronized">1.2.5. synchronized</h4>
-<div class="sect4">
-<h5 id="_实现原理">实现原理</h5>
-<div class="paragraph">
-<p>JVM 是通过进入、退出对象监视器( Monitor )来实现对方法、同步块的同步的。</p>
-</div>
-<div class="paragraph">
-<p>具体实现是在编译之后在 <strong>同步方法调用前</strong> 加入一个 <strong>monitor.enter</strong> 指令，在 <strong>退出方法和异常处</strong> 插入 <strong>monitor.exit</strong> 的指令。</p>
-</div>
-<div class="paragraph">
-<p>其本质就是对一个对象监视器( Monitor )进行获取，而这个获取过程具有排他性从而达到了同一时刻只能一个线程访问的目的。</p>
-</div>
-<div class="paragraph">
-<p>而对于没有获取到锁的线程将会阻塞到方法入口处，直到获取锁的线程 monitor.exit 之后才能尝试继续获取锁。</p>
-</div>
-<div class="paragraph">
-<p>流程图如下:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/synchronized实现同步原理的流程图.jpg" alt="synchronized实现同步原理的流程图">
 </div>
 </div>
 </div>
@@ -3038,6 +2975,30 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_逃逸分析">3.2. 逃逸分析</h3>
+<div class="paragraph">
+<p><a href="https://zhuanlan.zhihu.com/p/208366191" target="_blank" rel="noopener">你真的了解逃逸分析(Escape Analysis）么？</a></p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;逃逸分析，是一种可以有效减少Java 程序中同步负载和内存堆分配压力的跨函数全局数据流分析算法。通过逃逸分析，Java Hotspot编译器能够分析出一个新的对象的引用的使用范围从而决定是否要将这个对象分配到堆上。</p>
+</div>
+<div class="sect3">
+<h4 id="_逃逸分析的原理">3.2.1. 逃逸分析的原理</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;Java本身的限制（对象只能分配到堆中），我可以这么理解了，为了减少临时对象在堆内分配的数量，我会在一个方法体内定义一个局部变量，并且该变量在方法执行过程中未发生逃逸，按照JVM调优机制，首先会在堆内存创建类的实例，然后将此对象的引用压入调用栈，继续执行，这是JVM优化前的方式。然后，我采用逃逸分析对JVM进行优化。即针对栈的重新分配方式，首先找出未逃逸的变量，将该变量直接存到栈里，无需进入堆，分配完成后，继续调用栈内执行，最后线程执行结束，栈空间被回收，局部变量也被回收了。如此操作，是优化前在堆中，优化后在栈中，从而减少了堆中对象的分配和销毁，从而优化性能。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_逃逸的方式">3.2.2. 逃逸的方式</h4>
+<div class="paragraph">
+<p>&emsp;&emsp; <strong>方法逃逸</strong>：在一个方法体内，定义一个局部变量，而它可能被外部方法引用，比如作为调用参数传递给方法，或作为对象直接返回。或者，可以理解成对象跳出了方法。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp; <strong>线程逃逸</strong>：这个对象被其他线程访问到，比如赋值给了实例变量，并被其他线程访问到了。对象逃出了当前线程。</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -3303,39 +3264,344 @@ pipeline &#8594; jvm进程内的线程间管道
 </div>
 </div>
 <div class="sect2">
-<h3 id="_线程的生命周期">4.2. 线程的生命周期</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">五种状态</div>
+<h3 id="_volatile">4.2. volatile</h3>
+<div class="paragraph">
+<p>参考文档： <a href="https://www.cnblogs.com/javazhiyin/p/13521567.html" target="_blank" rel="noopener">面试官最爱的 volatile 关键字，这些问题你都搞懂了没？</a></p>
+</div>
+<div class="sect3">
+<h4 id="_什么是jmmjava内存模型">4.2.1. 什么是JMM(Java内存模型)</h4>
+<div class="paragraph">
+<p><a href="https://zhuanlan.zhihu.com/p/258393139" target="_blank" rel="noopener">面试官问我什么是JMM</a></p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;JMM指的是 在Java中定义了程序中各种变量的访问规范，屏蔽掉各种硬件和操作系统的内存访问差异，以实现让java程序在各种平台下都能达到一致的并发效果。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_volatile_的作用">4.2.2. volatile 的作用</h4>
+<div class="paragraph">
+<p>被 volatile 修饰的变量具有的特性：</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>新建状态(NEW)：当程序使用 new 关键字创建了一个线程之后,该线程就处于新建状态,此时仅由 JVM 为其分配
-内存,并初始化其成员变量的值。</p>
+<p><strong>保证此变量对所有线程的可见性</strong></p>
 </li>
 <li>
-<p>就绪状态(RUNNABLE)：当线程对象调用了 start()方法之后,该线程处于就绪状态。Java 虚拟机会为其创建方法调用栈和
-程序计数器,等待调度运行。</p>
-</li>
-<li>
-<p>运行状态(RUNNING)：如果处于就绪状态的线程获得了 CPU,开始执行 run()方法的线程执行体,则该线程处于运行状
-态。</p>
-</li>
-<li>
-<p>阻塞状态(BLOCKED)：阻塞状态是指线程因为某种原因放弃了 cpu 使用权,也即让出了 cpu timeslice,暂时停止运行。</p>
-</li>
-<li>
-<p>线程死亡(DEAD)：线程结束后就是死亡状态（三种结束方式：run()或 call()方法执行完成；异常结束；调用 stop）</p>
+<p><strong>禁止指令重排序优化</strong></p>
 </li>
 </ul>
+</div>
+<div class="sect4">
+<h5 id="_指令重排序">指令重排序</h5>
+<div class="paragraph">
+<p>&emsp;&emsp; <strong>在不改变程序执行结果的前提下，尽可能提高程序的运行效率</strong> ，意思是在不改变程序运行结果的情况下，调整代码执行顺序，优化程序。（JVM虚拟机的一种优化措施）。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;重排序不会影响单线程环境的执行结果，但是会破坏多线程的执行语义。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">volatile boolean isOK = false;
+
+//假设以下代码在线程A执行
+A.init();
+isOK=true;
+
+//假设以下代码在线程B执行
+while(!isOK){
+  sleep();
+}
+B.init();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;线程在初始化的时候，B线程处于睡眠状态，等待A线程完成初始化的时候才能够进行自己的初始化。这里的先后关系依赖于isOK这个变量。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;如果没有volatile修饰isOK这个变量，那么isOK的赋值就可能出现在A.init()之前（指令重排序,Java虚拟机的一种优化措施），此时A没有初始化，而B的初始化就破坏了它们之前形成的那种依赖关系，可能就会出错。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;volatile关键字通过 “<strong>内存屏障</strong>” 的方式来防止指令被重排序，即：<strong>在每个 volatile 读写操作前后加一种CPU指令</strong>。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+内存屏障: 内存屏障（Memory Barrier，或有时叫做内存栅栏，Memory Fence）是一种CPU指令，用于控制特定条件下的重排序和内存可见性问题。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_volatile的可见性问题">4.2.3. volatile的可见性问题</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;内存可见性是指当一个线程修改了某个变量的值，其它线程总是能知道这个变量变化。也就是说，如果线程 A 修改了共享变量 V 的值，那么线程 B 在使用 V 的值时，能立即读到 V 的最新值。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;使用 volatile 修饰共享变量后，每个线程要操作变量时会从主内存中将变量拷贝到本地内存作为副本。当线程操作变量副本并写回主内存后，会通过 <strong>CPU 总线嗅探机制</strong> 告知其他线程该变量副本已经失效，需要重新从主内存中读取。(CPU 总线嗅探机制 是实现缓存一致性的常见机制，想要了解更多可以看看这篇文章 <a href="https://zhuanlan.zhihu.com/p/138819184" target="_blank" rel="noopener">volatile 关键字，你真的理解吗？</a>)</p>
+</div>
+<div class="paragraph">
+<p>所以：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>每次直接从主内存读取值</strong>。</p>
+</li>
+<li>
+<p><strong>每次写入强制修改主内存的值</strong>。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>需要注意的是：volatile 是不能保证原子性的。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>&emsp;&emsp;在 Java 内存模型（JMM）中规定：线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了该线程以读/写共享变量的副本。这里所说的共享变量指的是实例变量和类变量，不包含局部变量，因为局部变量是线程私有的，因此不存在竞争问题。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>每一个线程还存在自己的工作内存，线程的工作内存，保留了被线程使用的变量的工作副本。</p>
+</li>
+<li>
+<p>线程对变量的所有的操作（读，取）都必须在工作内存中完成，而不能直接读写主内存中的变量。</p>
+</li>
+<li>
+<p>不同线程之间也不能直接访问对方工作内存中的变量，线程间变量的值的传递需要通过主内存中转来完成。</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/JMM示意图.webp" alt="JMM示意图">
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_synchronized">4.3. synchronized</h3>
+<div class="paragraph">
+<p><a href="https://blog.csdn.net/Hdu_lc14015312/article/details/100053032" target="_blank" rel="noopener">java中的几种锁（很详细）-小白收藏</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://juejin.cn/post/6973571891915128846" target="_blank" rel="noopener">这一次，彻底搞懂Java中的synchronized关键字</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://juejin.cn/post/6977744582725681182" target="_blank" rel="noopener">彻底理解Java并发编程之Synchronized关键字实现原理剖析</a></p>
+</div>
+<div class="sect3">
+<h4 id="_实现原理">4.3.1. 实现原理</h4>
+<div class="paragraph">
+<p>JVM 是通过进入、退出对象监视器( Monitor )来实现对方法、同步块的同步的。</p>
+</div>
+<div class="paragraph">
+<p>具体实现是在编译之后在 <strong>同步方法调用前</strong> 加入一个 <strong>monitor.enter</strong> 指令，在 <strong>退出方法和异常处</strong> 插入 <strong>monitor.exit</strong> 的指令。</p>
+</div>
+<div class="paragraph">
+<p>其本质就是对一个对象监视器( Monitor )进行获取，而这个获取过程具有排他性从而达到了同一时刻只能一个线程访问的目的。</p>
+</div>
+<div class="paragraph">
+<p>而对于没有获取到锁的线程将会阻塞到方法入口处，直到获取锁的线程 monitor.exit 之后才能尝试继续获取锁。</p>
+</div>
+<div class="paragraph">
+<p>流程图如下:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/synchronized实现同步原理的流程图.jpg" alt="synchronized实现同步原理的流程图">
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_线程的创建方式">4.3. 线程的创建方式</h3>
+<h3 id="_java中的锁">4.4. Java中的锁</h3>
 <div class="sect3">
-<h4 id="_thread">4.3.1. Thread</h4>
+<h4 id="_乐观锁">4.4.1. 乐观锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，只在更新的时候会判断一下在此期间别人有没有去更新这个数据。Java中的乐观锁基本是通过CAS实现的。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+乐观锁不能解决 ABA 问题。解决 ABA 问题，可以在修改数据中添加一个版本号，修改数据前，根据版本号确定数据是否被修改过。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_悲观锁">4.4.2. 悲观锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会阻塞，直到它拿到锁。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_自旋锁">4.4.3. 自旋锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;自旋锁原理非常简单，如果持有锁的线程能在很短时间内释放锁资源，那么那些等待竞争锁的线程就不需要做内核态和用户态之间的切换进入阻塞挂起状态，它们只需自旋，等持有锁的线程释放锁后即可立即获取锁，这样就避免用户线程和内核的切换的消耗。线程自旋需消耗 cup 的，如果一直获取不到锁，则线程长时间占用CPU自旋，需要设定一个自旋等待最大事件在最大等待时间内仍未获得锁就会停止自旋进入阻塞状态。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_公平锁和非公平锁">4.4.4. 公平锁和非公平锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;所谓公平指的是线程获取到锁时，争抢锁资源的线程是否遵循先到先得的规则。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;公平锁指的是锁的分配机制是公平的，通常先对锁提出获取请求的线程会先被分配到锁。非公平锁中存在后来的线程先获得锁资源的情况。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_可重入锁">4.4.5. 可重入锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;如果当前线程已经获得了某个监视器对象所持有的锁，那么该线程在该方法中调用另外一个同步方法也同样持有该锁。可重入锁最大的作用就是避免死锁。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_读写锁">4.4.6. 读写锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;读锁： 允许多个线程获取读锁，同时访问同一个资源。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;写锁： 只允许一个线程获取写锁，不允许同时访问同一个资源。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;Java中的读写锁：ReentrantReadWriteLock</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_独占锁和共享锁">4.4.7. 独占锁和共享锁</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;独占锁：每次只能有一个线程能持有锁</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;共享锁：允许多个线程同时获取锁，并发访问共享资源</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_锁粗化">4.4.8. 锁粗化</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;锁粗化是一种优化技术： 如果一系列的连续操作都对同一个对象反复加锁和解锁，甚至加锁操作都是出现在循环体体之中，就算真的没有线程竞争，频繁地进行互斥同步操作将会导致不必要的性能损耗，所以就采取了一种方案：把加锁的范围扩展（粗化）到整个操作序列的外部，这样加锁解锁的频率就会大大降低，从而减少了性能损耗。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_线程的生命周期">4.5. 线程的生命周期</h3>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">线程的6种状态</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>初始(NEW)</strong>：新创建了一个线程对象，但还没有调用start()方法。</p>
+</li>
+<li>
+<p><strong>运行(RUNNABLE)</strong>：Java线程中将就绪（ready）和运行中（running）两种状态笼统的称为“运行”。<br>
+线程对象创建后，其他线程(比如main线程）调用了该对象的start()方法。该状态的线程位于可运行线程池中，等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在获得CPU时间片后变为运行中状态（running）。</p>
+</li>
+<li>
+<p><strong>等待(WAITING)</strong>：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。</p>
+</li>
+<li>
+<p><strong>阻塞(BLOCKED)</strong>：表示线程阻塞于锁。</p>
+</li>
+<li>
+<p><strong>超时等待(TIMED_WAITING)</strong>：该状态不同于WAITING，它可以在指定的时间后自行返回。</p>
+</li>
+<li>
+<p><strong>终止(TERMINATED)</strong>：表示该线程已经执行完毕。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/线程的生命周期(线程的6种状态).jpeg" alt="线程的生命周期(线程的6种状态)">
+</div>
+</div>
+<div class="sect3">
+<h4 id="_yield">4.5.1. yield()</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;线程调用了yield()方法，意思是放弃当前获得的CPU时间片，回到就绪状态，这时与其他进程处于同等竞争状态</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_join">4.5.2. join()</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;使得放弃当前线程的执行，并返回对应的线程。程序在main线程中调用t1线程的join方法，则main线程放弃cpu控制权，并返回t1线程继续执行直到线程t1执行完毕所以结果是t1线程执行完后，才到主线程执行，相当于在main线程中同步t1线程，t1执行完了，main线程才有执行的机会。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_wait_和_notify">4.5.3. wait() 和 notify()</h4>
+<div class="paragraph">
+<p>&emsp;&emsp;当线程调用wait()方法后会进入等待队列（进入这个状态会释放所占有的所有资源，与阻塞状态不同），进入这个状态后，是不能自动唤醒的，必须依靠其他线程调用notify()或notifyAll()方法才能被唤醒（由于notify()只是唤醒一个线程，但我们由不能确定具体唤醒的是哪一个线程，也许我们需要唤醒的线程不能够被唤醒，因此在实际使用时，一般都用notifyAll()方法，唤醒有所线程），线程被唤醒后会进入锁池，等待获取锁标记。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_wait_和_sleep_的区别">4.5.4. wait() 和 sleep() 的区别</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>wait() 来自 Object 类，sleep() 来自 Thread 类</p>
+</li>
+<li>
+<p>sleep() 没有释放锁；wait() 释放了锁，让敏感词线程可以使用同步块或方法。</p>
+</li>
+<li>
+<p>wait()、notify() 和 notifyAll() 只能在同步方法或控制块里使用，只有在synchronized方法或块中当前线程才占有锁，才有锁可以释放；sleep() 可以在任何地方使用。</p>
+</li>
+<li>
+<p>sleep() 必须捕获异常；wait()、notify() 和 notifyAll() 不需要</p>
+</li>
+<li>
+<p>wait() 不加时间限制，要等待 notify() 或 notifyAll() 唤醒等待池中所有的线程（执行完 notify() 或 notifyAll() 或 wait() 后，并不立即获得或释放锁，而是执行完同步块后再释放或获得），才会进入就绪队列等待OS分配系统资源；sleep() 可以设置时间唤醒，如果时间不到，只能用interrupt()强行打断。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_interrupted_和_isinterrupted_的区别">4.5.5. interrupted() 和 isInterrupted() 的区别</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>二个方法都是判断线程是否停止的方法</p>
+</li>
+<li>
+<p>前者是静态方法，后者是非静态方法。interrupted() 是作用于当前正在运行的线程，isInterrupted() 是作用于调用该方法的线程对象所对应的线程。</p>
+</li>
+<li>
+<p>前者会将中断状态清除而后者不会。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_线程的创建方式">4.6. 线程的创建方式</h3>
+<div class="sect3">
+<h4 id="_thread">4.6.1. Thread</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class NewThread extends Thread {
@@ -3361,7 +3627,7 @@ Thread 本质上是实现了 Runable 接口。
 </div>
 </div>
 <div class="sect3">
-<h4 id="_runable">4.3.2. Runable</h4>
+<h4 id="_runable">4.6.2. Runable</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class NewThread implements Runnable {
@@ -3375,7 +3641,7 @@ new Thread（new NewThread()).start();</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_callable">4.3.3. Callable</h4>
+<h4 id="_callable">4.6.3. Callable</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ExecutorService、Callable&lt;Class&gt;、Future (子线程会有返回值)
@@ -3427,7 +3693,7 @@ class Task implements Callable&lt;String&gt;{
 </div>
 </div>
 <div class="sect3">
-<h4 id="_基于线程池的方式">4.3.4. 基于线程池的方式</h4>
+<h4 id="_基于线程池的方式">4.6.4. 基于线程池的方式</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// 创建线程池
@@ -3462,7 +3728,7 @@ while(true) {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_runable和callable区别">4.3.5. Runable和Callable区别</h4>
+<h4 id="_runable和callable区别">4.6.5. Runable和Callable区别</h4>
 <div class="listingblock">
 <div class="content">
 <pre>1. Runable 没有返回值，Callable有返回值（返回Future对象）
@@ -3485,13 +3751,42 @@ Callalble接口支持返回执行结果，需要调用FutureTask.get()得到，�
 </div>
 </div>
 <div class="sect2">
-<h3 id="_java线程池">4.4. Java线程池</h3>
+<h3 id="_java线程池">4.7. Java线程池</h3>
 <div class="paragraph">
 <p><strong>线程池原理</strong>：<br>
 线程池做的工作主要是控制运行的线程的数量，处理过程中将任务放入队列,然后在线程创建后，启动这些任务,如果线程数量超过了最大数量超出数量的线程排队等候，等其它线程执行完毕，再从队列中取出任务来执行。他的主要特点为: <code>线程复用</code>，<code>控制最大并发数</code>，<code>管理线程</code>。</p>
 </div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">线程池的5种状态</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>RUNNING</strong>：表示线程池处于运行状态，能够接受新提交的任务且能对已添加的任务进行处理。RUNNING状态是线程池的初始化状态，线程池一旦被创建就处于RUNNING状态。</p>
+</li>
+<li>
+<p><strong>SHUTDOWN</strong>：线程处于关闭状态，不接受新任务，但可以处理已添加的任务。RUNNING状态的线程池调用shutdown后会进入SHUTDOWN状态。</p>
+</li>
+<li>
+<p><strong>STOP</strong>：线程池处于停止状态，不接收任务，不处理已添加的任务，且会中断正在执行任务的线程。RUNNING状态的线程池调用了shutdownNow后会进入STOP状态。</p>
+</li>
+<li>
+<p><strong>TIDYING</strong>：当所有任务已终止，且任务数量为0时，线程池会进入TIDYING。当线程池处于SHUTDOWN状态时，阻塞队列中的任务被执行完了，且线程池中没有正在执行的任务了，状态会由SHUTDOWN变为TIDYING。当线程处于STOP状态时，线程池中没有正在执行的任务时则会由STOP变为TIDYING。</p>
+</li>
+<li>
+<p><strong>TERMINATED</strong>：线程终止状态。处于TIDYING状态的线程执行terminated()后进入TERMINATED状态。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/线程池的5种状态.awebp" alt="线程池的5种状态">
+</div>
+</div>
 <div class="sect3">
-<h4 id="_threadpoolexecutor_推荐">4.4.1. ThreadPoolExecutor (推荐)</h4>
+<h4 id="_threadpoolexecutor_推荐">4.7.1. ThreadPoolExecutor (推荐)</h4>
 <div class="paragraph">
 <p>ThreadPoolExecutor 创建线程池的几个核心参数： <code>核心线程数</code>， <code>最大线程数</code>， <code>超过核心线程数量的线程最大空闲时间</code>， <code>时间单位</code>， <code>阻塞队列</code>， <code>拒绝策略</code>。</p>
 </div>
@@ -3556,6 +3851,9 @@ Callalble接口支持返回执行结果，需要调用FutureTask.get()得到，�
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>也可以自定义拒绝策略，只需要实现 <strong>RejectedExecutionHandler</strong> 接口。</p>
+</div>
 <div class="listingblock">
 <div class="title">创建线程池</div>
 <div class="content">
@@ -3580,7 +3878,7 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect3">
-<h4 id="_executors">4.4.2. Executors</h4>
+<h4 id="_executors">4.7.2. Executors</h4>
 <div class="paragraph">
 <p>Executors 创建线程池其实也是通过 <code>ThreadPoolExecutor</code> 进行创建的，只不过参数固定，<code>ThreadPoolExecutor</code> 参数不固定，在开发中更加符合业务需求，所以更推荐使用 <code>ThreadPoolExecutor</code> 创建线程池。</p>
 </div>
@@ -3632,9 +3930,9 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect2">
-<h3 id="_记一次多线程研发遇到的坑">4.5. 记一次多线程研发遇到的坑</h3>
+<h3 id="_记一次多线程研发遇到的坑">4.8. 记一次多线程研发遇到的坑</h3>
 <div class="sect3">
-<h4 id="_问题背景">4.5.1. 问题背景</h4>
+<h4 id="_问题背景">4.8.1. 问题背景</h4>
 <div class="listingblock">
 <div class="content">
 <pre>1. 开发一套经验支持系统，就是通过创建公共的经验模型和规则，然后由模型获取并整合数据，将数据输入规则中，得到返回结果。
@@ -3652,7 +3950,7 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect3">
-<h4 id="_研发方案的迭代">4.5.2. 研发方案的迭代</h4>
+<h4 id="_研发方案的迭代">4.8.2. 研发方案的迭代</h4>
 <div class="listingblock">
 <div class="content">
 <pre>1. for循环
@@ -3661,7 +3959,7 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 </div>
 </div>
 <div class="sect3">
-<h4 id="_遇到的坑">4.5.3. 遇到的坑</h4>
+<h4 id="_遇到的坑">4.8.3. 遇到的坑</h4>
 <div class="sect4">
 <h5 id="_1死锁">1、死锁</h5>
 <div class="listingblock">
@@ -3732,77 +4030,297 @@ ThreadPoolExecutorthreadPoolExecutor = new ThreadPoolExecutor(corePoolSize,
 <div class="content">
 <pre>1. 在正式环境中，日志的打印等级要调低一些，尽量使用 Error 作为日志输出等级。
 
-2. TODO: 在调低日志等级后，目前内存占用还是在缓慢增长。还没有排查出原因，未完待续...</pre>
+2. 排查程序中是否有对象没有被回收掉，导致内存泄漏，然后修改代码。（排查过程在后续中会些出来）</pre>
 </div>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_两个线程共享数据">4.6. 两个线程共享数据</h3>
-<div class="sect3">
-<h4 id="_volatile_2">4.6.1. volatile</h4>
-<div class="listingblock">
-<div class="content">
-<pre>其一是保证该变量对所有线程可见,这里的可见性指的是当一个线程修改了变量的值,那么新的值对于其他线程是可以立即获取的。</pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_synchronized_2">4.6.2. synchronized</h4>
-<div class="listingblock">
-<div class="content">
-<pre>1.利用锁的机制来实现同步的 +
-2.在同一时间只允许一个线程持有某个对象锁,保证同一时间只有一个线程对需同步的代码块(复合操作)进行访问</pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_runnable_对象作为一个类的内部类">4.6.3. Runnable 对象作为一个类的内部类</h4>
+<div class="sect5">
+<h6 id="_4_排查内存泄漏的原因">(4) 排查内存泄漏的原因</h6>
 <div class="paragraph">
-<p>将 Runnable 对象作为一个类的内部类,共享数据作为这个类的成员变量,每个线程对共享数据的操作方法也封装在外部类,以便实现对数据的各个操作的同步和互斥, <code>作为内部类的各个 Runnable 对象调用外部类的这些方法</code></p>
+<p>说明：异常管控服务是通过 K8s 进行部署的。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>首先第一步进入到部署的容器中，命令： <strong>docker exec -it 容器名 /bin/bash</strong></p>
+</li>
+<li>
+<p>然后查看java进程列表，命令： <strong>ps -ef | grep java</strong></p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/查看java进程.png" alt="查看java进程">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>通过 <strong>jmap</strong> 命令，查看查看堆内存的使用情况，命令：<strong>jmap -heap 进程id</strong></p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class MyData {
-    private int j=0;
-    public synchronized void add(){
-        j++;
-        System.out.println("线程"+Thread.currentThread().getName()+"j 为:"+j);
-    }
+<pre>堆内存详情参数解释：
 
-    public synchronized void dec(){
-        j--;
-        System.out.println("线程"+Thread.currentThread().getName()+"j 为:"+j);
-    }
+Heap Configuration:         ## 堆配置情况，也就是JVM参数配置的结果[平常说的tomcat配置JVM参数，就是在配置这些]
+   MinHeapFreeRatio         = 40                            //JVM堆最小空闲比率(default 40)
+   MaxHeapFreeRatio         = 70                            //JVM堆最大空闲比率(default 70)
+   MaxHeapSize              = 402653184 (384.0MB)           //JVM堆的最大大小
+   NewSize                  = 8388608 (8.0MB)               //JVM堆的‘新生代’的默认大小
+   MaxNewSize               = 134217728 (128.0MB)           //JVM堆的‘新生代’的最大大小
+   OldSize                  = 16777216 (16.0MB)             //JVM堆的‘老生代’的大小
+   NewRatio                 = 2                             //‘新生代’和‘老生代’的大小比率
+   SurvivorRatio            = 8                             //年轻代中Eden区与Survivor区的大小比值
+   MetaspaceSize            = 21807104 (20.796875MB)        //元空间大小
+   CompressedClassSpaceSize = 1073741824 (1024.0MB)         //元空间中类区域的大小
+   MaxMetaspaceSize         = 17592186044415 MB             //元空间最大值，设置这么大，意思是让jvm自己去管理
+   G1HeapRegionSize         = 0 (0.0MB)
 
-    public int getData(){
-        return j;
-    }
-}
-public class TestThread {
-    public static void main(String[] args) {
-        MyData data = new MyData();
-        for(int i=0;i&lt;2;i++){
-            new Thread(new Runnable(){
-                public void run() {
-                    data.add();
-                }
-            }).start();
-
-            new Thread(new Runnable(){
-                public void run() {}
-            }).start();
-        }
-    }
-}</code></pre>
+Heap Usage:                ## 堆内存分布
+New Generation (Eden + 1 Survivor Space):                   //新生代（Eden区 + survior(from + to)空间）
+   capacity = 70713344 (67.4375MB)                          //新生代区容量
+   used     = 38155000 (36.38744354248047MB)                //新生代区已经使用大小
+   free     = 32558344 (31.05005645751953MB)                //新生代区剩余容量
+   53.95728421498494% used                                  //使用比例
+Eden Space:                                                 //Eden区容量
+   capacity = 62914560 (60.0MB)
+   used     = 37078688 (35.360992431640625MB)
+   free     = 25835872 (24.639007568359375MB)
+   58.93498738606771% used
+From Space:                                                 //from survior
+   capacity = 7798784 (7.4375MB)
+   used     = 1076312 (1.0264511108398438MB)
+   free     = 6722472 (6.411048889160156MB)
+   13.801023339023109% used
+To Space:                                                   //to survior
+   capacity = 7798784 (7.4375MB)
+   used     = 0 (0.0MB)
+   free     = 7798784 (7.4375MB)
+   0.0% used
+PS Old Generation:                                         //老年代
+   capacity = 156958720 (149.6875MB)
+   used     = 125501120 (119.68719482421875MB)
+   free     = 31457600 (30.00030517578125MB)
+   79.95804247129436% used</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>查看java进程中的堆内存对象数量情况，命令： <strong>jmap -histo:live 进程id</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>下面三张图是服务不同时期，堆内存对象数量情况：</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;1.服务已启动，未运行模型的堆内存中对象数量情况</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/堆内存对象数量情况03.png" alt="堆内存对象数量情况03">
+</div>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;2.服务已启动，在执行模型，服务启动时间不长的堆内存对象数量情况</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/堆内存对象数量情况01.png" alt="堆内存对象数量情况01">
+</div>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;3.服务已启动，在执行模型，运行了一段时间后，快到达最大堆内存   的堆内存对象数量情况</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/堆内存对象数量情况02.png" alt="堆内存对象数量情况02">
+</div>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;从上面三张图中可以看出，服务随着运行时间的增加，内存占用越来越高，可以看出有很多的对象数量一直再增加，比如 <strong>ThreadLocalMap</strong> 对象。一开始我看到这个的时候，还以为是某个 ThreadLocal 使用后没有被回收，造成内存泄漏。然后我立马去看代码，经过仔细的排查后，所有的 ThreadLocal 都在使用后，及时的调用了 clear() 方法的，所以并不是 ThreadLocal 造成内存缓慢增长的。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>把进程的内存使用情况dump到文件中，使用命令：<strong>jmap -dump:format=b,file=文件名.hprof 进程id</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;然后将该文件下载到本地，使用 <strong>MemoryAnalyzer</strong> 工具，查询内存使用情况。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/java内存dump文件分析01.png" alt="java内存dump文件分析01">
+</div>
+</div>
+<div class="paragraph">
+<p>从上图中可以看出 ThreadLocalMap 在哪个线程中，经过一系列的排查，导致内存缓慢升高的原因是：<strong>进程中的线程数量一直在增加</strong> ，由于线程是通过线程池创建的，模型实例的数量也很多，并发很高，所以线程基本是一直处于占用状态，然后随着线程数量的增加，内存占用就越来越高。</p>
+</div>
+<div class="paragraph">
+<p>最终解决方案：根据我们的线程池配置，当线程池的核心数量使用完后，堆内存占用大概 3G，所以我们配置了堆内存大小 4G。</p>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_threadlocal_作用线程本地存储">4.7. ThreadLocal 作用(线程本地存储)</h3>
+<h3 id="_记一次实战项目遇到的问题和解决方案智能决策平台">4.9. 记一次实战项目遇到的问题和解决方案（智能决策平台）</h3>
+<div class="paragraph">
+<p>智能决策平台实现的主要功能：获取到多个数据，然后将数据经由专业的业务规则和历史数据的数学模型，最终生成决策结果。</p>
+</div>
+<div class="paragraph">
+<p>产生以下问题的大部分原因在于数据量太大，或者并发太高了。在只有一个租户的的情况下，气田生产业务域一天能产生 7G 的数据，石油工程一天能产生 12G 的数据。</p>
+</div>
+<div class="sect3">
+<h4 id="_问题一">4.9.1. 问题一</h4>
+<div class="sect4">
+<h5 id="_1_问题描述_2">(1) 问题描述</h5>
+<div class="listingblock">
+<div class="content">
+<pre>为了提高模型执行效率，项目中采用了多线程的的方式执行模型实例和查询每个实例的执行数据。采用多线程就会涉及到线程池的配置问题，线程池数量配置的过高或者过低，都会导致模型执行时间过长。</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_解决方案">(2) 解决方案</h5>
+<div class="listingblock">
+<div class="content">
+<pre>该系统是一个IO密集型的，我们也做过相关调研，网上说的IO密集型的 线程数等于CPU核心数 * 2，CPU密集型的线程数等于CPU核心数 + 1；在这个系统中是不适用的，很是得根据实际情况来配置（还有就是我们的服务器配置很高的，有144核500G，也有192核1T）。
+通过大量的测试，得出结论，规则执行的线程池线程数 ：查询执行数据的线程池线程数 = 1:5 （或1:4）为最优配置。</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_实际配置如下">(2) 实际配置如下</h5>
+<div class="paragraph">
+<p>实际配置可能没有按照 1:5 进行配置</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml"># 线程池配置
+thread-pool:
+  async-task:
+    # 执行模型规则的线程池
+    rule-exec:
+      core-pool-size: 1500
+      max-pool-size: 3000
+      keep-alive-time: 30
+      queue-capacity: 20000
+      thread-name-prefix: rule-executor-thread-
+      # 拒绝策略：CallerRunsPolicy，AbortPolicy，DiscardPolicy，DiscardOldestPolicy
+      rejected-policy: CallerRunsPolicy
+    # 执行规则时，数据集查询数据的线程池
+    dataset-exec:
+      core-pool-size: 5000
+      max-pool-size: 10000
+      keep-alive-time: 30
+      queue-capacity: 20000
+      thread-name-prefix: dataset-executor-thread-
+      # 拒绝策略：CallerRunsPolicy，AbortPolicy，DiscardPolicy，DiscardOldestPolicy
+      rejected-policy: CallerRunsPolicy</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_问题二">4.9.2. 问题二</h4>
+<div class="sect4">
+<h5 id="_1_问题描述_3">(1) 问题描述</h5>
+<div class="listingblock">
+<div class="content">
+<pre>系统采用Elasticsearch保存模型执行有大量的执行记录和告警记录，Es频繁报错，有大量的数据保存失败，造成数据丢失。（注：Es的配置是三主三从，八核20G内存，1T的存储）</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_原因">(2) 原因</h5>
+<div class="listingblock">
+<div class="content">
+<pre>由于模型大部分是定时任务触发，任务触发后，采用多线程的方式保存执行记录，并且项目是多实例部署的，使得Es承载的并发太高，然后数据频繁失败。</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_3_解决方案">(3) 解决方案</h5>
+<div class="listingblock">
+<div class="content">
+<pre>1. 添加了重试次数，模型实例数量增加到一定数量，还是会有很多数据保存失败。
+2. 将执行记录放入到内存中，然后使用 CommandLineRunner 启动一个线程，一直去内存中取数据，然后批量保存到ES，降低ES的请求频率，从而降低压力。
+3. 为了保证执行记录全部保存成功，采用优雅停机的方式，接收到 kill -2 的信号后，会等待一定的时间再停止服务。</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_问题三">4.9.3. 问题三</h4>
+<div class="sect4">
+<h5 id="_1_问题描述_4">(1) 问题描述</h5>
+<div class="listingblock">
+<div class="content">
+<pre>模型在执行过程中，数据库查询缓慢，导致执行时间过长的问题。</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_原因_2">(2) 原因</h5>
+<div class="listingblock">
+<div class="content">
+<pre>1. 数据库查询次数过多，数据库压力太大了（数据库已经是主从配置了）。
+2. 系统配置的数据源连接数太少。
+3. MySQL本身配置的最大连接数太少，当有多个服务的实例（Pod）连接数据库时，连接不够用。（主要是该数据库是采用容器部署的，为了能资源利用最大化，所以在部署MySQL服务器时，给数据库配置的有些资源都比较低）</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_3_解决方案_2">(3) 解决方案</h5>
+<div class="listingblock">
+<div class="content">
+<pre>1. 能够使用Redis的地方尽量使用Redis。
+2. 系统要配置合适的数据源连接配置。
+3. 调整好数据库应该分配足够的资源和配置好MySQL本身的配置。</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_问题三_2">4.9.4. 问题三</h4>
+<div class="sect4">
+<h5 id="_1_问题描述_5">(1) 问题描述</h5>
+<div class="listingblock">
+<div class="content">
+<pre>在模板中有大量的SQL查询数据集，导致模型执行时间过长；并且由于查询时间很长，会使得其一直占用的线程，导致其他模型的执行时间很长，告警消息滞后，不能准时告警。</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_原因_3">(2) 原因</h5>
+<div class="listingblock">
+<div class="content">
+<pre>1. SQL请求频率高，数据库查询压力大。
+2. SQL非常复杂，有的SQL不走索引；有的SQL中做了大量计算；有的SQL有大量的子查询；对同一张表多次扫描。</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_3_解决方案_3">(3) 解决方案</h5>
+<div class="listingblock">
+<div class="content">
+<pre>1. 对部分数据做缓存，筛选出可以做缓存的数据集（该数据集的SQL简单，查询的表数据更新不频繁），通过canal配置监控表，如果发生变化，更新对应数据就可以了。
+2. 将执行缓慢的模型筛选出来，单独部署一套执行这些模型的环境，增加机器资源，避免这些执行缓慢的模型影响到执行很快的模型。
+3. 将变化频繁的数据，（比如实时录井数据）存入缓存，然后在提供查询缓存的API接口，以API接口查询缓存，减少对数据库的查询次数。</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_threadlocal_作用线程本地存储">4.10. ThreadLocal 作用(线程本地存储)</h3>
 <div class="paragraph">
 <p>最常见的 ThreadLocal 使用场景为：</p>
 </div>
@@ -3810,6 +4328,9 @@ public class TestThread {
 <ul>
 <li>
 <p>用来解决 数据库连接、Session 管理等。</p>
+</li>
+<li>
+<p>记录当前登录用户信息。</p>
 </li>
 <li>
 <p>还可以保存针对某个线程的所有输出日志，然后统一保存日志，比如说定时任务日志。</p>
@@ -3820,7 +4341,7 @@ public class TestThread {
 <p>ThreadLocal，很多地方叫做 <strong>线程本地变量</strong>，也有些地方叫做线程本地存储，ThreadLocal 的作用是提供线程内的局部变量，这种变量在线程的生命周期内起作用，减少同一个线程内多个函数或者组件之间一些公共变量的传递的复杂度。</p>
 </div>
 <div class="sect3">
-<h4 id="_threadlocal结构">4.7.1. ThreadLocal结构</h4>
+<h4 id="_threadlocal结构">4.10.1. ThreadLocal结构</h4>
 <div class="paragraph">
 <p>在 ThreadLocal 中，有一个内部类 <strong>ThreadLocalMap</strong>。ThreadLocalMap 中定义了一个 <strong>Entry 数组</strong>。</p>
 </div>
@@ -3836,9 +4357,48 @@ public class TestThread {
 <div class="paragraph">
 <p>我们还要注意 <strong>Entry</strong>， 它的 <strong>key</strong> 是 <strong>ThreadLocal&lt;?&gt; k</strong> ，继承自 <strong>WeakReference</strong>， 也就是我们常说的 <strong>弱引用类型</strong>。</p>
 </div>
+<div class="paragraph">
+<p>threadLocalMap的结构图如下：</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/threadLocalMap结构.awebp" alt="threadLocalMap结构">
+</div>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_threadlocal父子线程数据传递方案">4.7.2. ThreadLocal父子线程数据传递方案</h4>
+<h4 id="_threadlocal内存泄漏问题">4.10.2. ThreadLocal内存泄漏问题</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>为什么ThreadLocalMap中的Entry要继承WeakReference，使ThreadLocal作为一个弱引用呢？</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;我们知道，弱引用在发生GC时这个对象一定会被回收。通常来说使用弱引用是为了避免内存泄漏。这里也不例外，ThreadLocal使用弱引用可以避免内存泄漏问题的发生。</p>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;试想，如果将ThreadLocal声明为强引用，一旦ThreadLocal不再使用，就需要被回收。但是此时由于ThreadLocalMap中的Entry数组持有了ThreadLocal。导致ThreadLocal不能够被回收而出现内存泄漏。那么，如果将ThreadLocal声明为弱引用就可以避免这一问题的出现。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>为什么需要及时的调用 ThreadLocal.remove() 方法呢？</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/threadLocal的引用链.awebp" alt="threadLocal的引用链">
+</div>
+</div>
+<div class="paragraph">
+<p>&emsp;&emsp;如上图所示，在ThreadLocal中存在一个这样的引用连。如果Thread一直在运行，那么此时由于强引用的value不能被回收，故此种情况下也可能出现内存泄漏的问题。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_threadlocal父子线程数据传递方案">4.10.3. ThreadLocal父子线程数据传递方案</h4>
 <div class="sect4">
 <h5 id="_子线程能否直接拿到父线程threadlocal中的值">子线程能否直接拿到父线程ThreadLocal中的值？</h5>
 <div class="paragraph">
@@ -3915,24 +4475,12 @@ public class TestThread {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inheritablethreadlocal和线程池之间的问题">4.7.3. InheritableThreadLocal和线程池之间的问题</h4>
+<h4 id="_inheritablethreadlocal和线程池之间的问题">4.10.4. InheritableThreadLocal和线程池之间的问题</h4>
 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_指令重排序">4.8. 指令重排序</h3>
-<div class="paragraph">
-<p>什么是指令重排序？</p>
-</div>
-<div class="paragraph">
-<p>Java虚拟机的一种优化措施，<strong>在不改变程序执行结果的前提下，尽可能提高程序的运行效率</strong>。意思是在不改变程序运行结果的情况下，调整代码执行顺序，优化程序。</p>
-</div>
-<div class="paragraph">
-<p>重排序不会影响单线程环境的执行结果，但是会破坏多线程的执行语义。</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_多线程框架">4.9. 多线程框架</h3>
+<h3 id="_多线程框架">4.11. 多线程框架</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -7315,7 +7863,7 @@ Last updated 2022-01-06 15:17:00 +0800
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 <script type="text/x-mathjax-config">
